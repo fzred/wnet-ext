@@ -1,4 +1,5 @@
 var requestStats = window.requestStats = []
+var lastTabId = -1
 
 function genStats() {
   return {
@@ -8,8 +9,8 @@ function genStats() {
   }
 }
 
-function setBadgeText(tabId) {
-  const tabStats = requestStats[tabId]
+function setBadgeText() {
+  const tabStats = requestStats[lastTabId]
   if (tabStats) {
     chrome.browserAction.setBadgeText({
       text: `${tabStats.occurredList.length}`
@@ -28,7 +29,8 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 })
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
-  setBadgeText(activeInfo.tabId)
+  lastTabId = activeInfo.tabId
+  setBadgeText()
 })
 
 function requestCB(details, isCompleted) {
@@ -47,7 +49,9 @@ function requestCB(details, isCompleted) {
   }
   requestStats[details.tabId] = tabStats
 
-  setBadgeText(details.tabId)
+  if (lastTabId === details.tabId) {
+    setBadgeText()
+  }
 }
 
 chrome.webRequest.onCompleted.addListener(function (details) {
@@ -63,7 +67,10 @@ chrome.webRequest.onCompleted.addListener(function (details) {
 );
 
 chrome.webRequest.onErrorOccurred.addListener(function (details) {
-  requestCB(details, false)
+  if (details.error !== "net::ERR_BLOCKED_BY_CLIENT") {
+    console.log(details)
+    requestCB(details, false)
+  }
 }, {
   urls: [
     "<all_urls>"
