@@ -1,0 +1,29 @@
+<div
+  id="app"
+  style="width: 500px"
+>
+  <div v-if="stats">
+    <h3>occurredListDomain</h3>
+    <ul>
+      <li v-for="item in occurredListDomain">
+        {{item}}
+      </li>
+    </ul>
+
+    <h3>stats.occurredList</h3>
+    <ul>
+      <li v-for="item in stats.occurredList">
+        {{item.url}}
+      </li>
+    </ul>
+
+    <h3>completeListDomain</h3>
+    <ul>
+      <li v-for="item in completeListDomain">
+        {{item}}
+      </li>
+    </ul>
+  </div>
+</div>
+<script src="./js/vue.min.js"></script>
+<script src="./js/popup.js"></script>
